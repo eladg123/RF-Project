@@ -1,0 +1,4 @@
+redis
+pymongo
+psycopg2-binary
+minio
