@@ -6,7 +6,6 @@ from pymongo import MongoClient
 from minio import Minio
 from datetime import datetime
 
-# התחברות לכל הרכיבים
 r = redis.Redis(host='localhost', port=6379, db=0)
 mongo_client = MongoClient('mongodb://localhost:27017/')
 mongo_db = mongo_client['rf_system']
@@ -34,7 +33,6 @@ def process_data():
     print("Consumer started. Waiting for data...")
     
     while True:
-        # המתנה להודעה מהתור (timeout=0 פירושו המתנה אינסופית)
         result = r.brpop('rf_data_queue', timeout=0)
         if not result:
             continue
@@ -42,11 +40,11 @@ def process_data():
         _, message = result
         data = json.loads(message)
         
-        # 1. חישוב ממוצע נע (על 5 הדגימות האחרונות)
+       
         samples = data['samples']
         avg = sum(samples[-5:]) / 5
         
-        # 2. זיהוי חריגות ושמירה ב-MongoDB
+        
         if avg > -40:
             alert = {
                 "id": data['id'],
@@ -59,7 +57,7 @@ def process_data():
             mongo_db.alerts.insert_one(alert)
             print(f"⚠️ Alert detected for {data['id']}")
 
-        # 3. שמירה ב-MinIO
+        
         file_name = f"{data['id']}.json"
         json_bytes = json.dumps(data).encode('utf-8')
         minio_client.put_object(
@@ -69,7 +67,7 @@ def process_data():
             length=len(json_bytes)
         )
 
-        # 4. שמירה ב-PostgreSQL
+       
         with pg_conn.cursor() as cur:
             cur.execute("""
                 INSERT INTO samples (id, timestamp, avg_val, file_path) 
@@ -77,7 +75,7 @@ def process_data():
             """, (data['id'], data['timestamp'], avg, file_name))
             pg_conn.commit()
 
-        # 5. עדכון בוליאני
+        
         data['is_processed'] = True
         print(f"✅ Processed {data['id']}")
 

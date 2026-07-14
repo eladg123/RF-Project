@@ -7,7 +7,7 @@ import json
 
 app = FastAPI()
 
-# הגדרת CORS כדי שהדשבורד ב-React יוכל לגשת ל-API
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,7 +15,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# חיבורים
 pg_conn = psycopg2.connect("dbname=signals_db user=user password=password host=localhost port=5432")
 mongo_client = MongoClient('mongodb://localhost:27017/')
 mongo_db = mongo_client['rf_system']

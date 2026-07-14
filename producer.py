@@ -5,9 +5,6 @@ import uuid
 import random
 from datetime import datetime
 
-
-# התחברות אל redis בפורט המותאם שלנו, פונקציית יצירת פקטה אשר יוצרת על פי השדות המבוקשים פקטה. ופונקציה הרצה שמייצרת פקטה כל שתי שניות. 
-
 r = redis.Redis(host='localhost', port=6379, db=0)
 
 def generate_packet():
